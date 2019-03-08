@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- set the environment variable GAZEBO_MODEL_PATH to the folder bebop/gazebo/models to define the path where GAZEBO looks for the models -->
+<env name="GAZEBO_MODEL_PATH" value="$(find bebop_gazebo)/models:$GAZEBO_MODEL_PATH" />
+
+   <!-- Declaration of arguments used in the UAV model -->
+   <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
+   <arg name="x" default="0.0"/>
+   <arg name="y" default="0.0"/>
+   <arg name="z" default="0.3"/>
+
+   <arg name="use_ground_truth_for_tf" default="true"/>
+   <arg name="use_ground_truth_for_control" default="true"/>
+   <arg name="use_pose_estimation" if="$(arg use_ground_truth_for_control)" default="false"/>
+   <arg name="use_pose_estimation" unless="$(arg use_ground_truth_for_control)" default="true"/>
+
+
+<!-- Start Gazebo and open the proj_welt world -->
+<include file="$(find hector_gazebo_worlds)/launch/start.launch">
+ <arg name="world" value="$(find gazebo_sim)/worlds/empty_grass.world"/>
+</include>
+
+<!-- Spawn the model of the UAV -->
+<include file="$(find gazebo_sim)/launch/spawn_UAV.launch" >
+   <arg name="name" value="UAV"/>
+   <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_hokuyo_utm30lx.gazebo.xacro"/>
+   <arg name="controllers" value="
+        controller/attitude
+        controller/velocity
+        controller/position"/>
+     <arg name="max_xy_vel" value="2.0"/>                        <!--argument used to set the maximum xy velocity of the UAV-->
+     <arg name="tf_prefix" default="$(arg tf_prefix)"/>
+     <arg name="x" default="$(arg x)"/>
+     <arg name="y" default="$(arg y)"/>
+     <arg name="z" default="$(arg z)"/>   
+     <arg name="use_ground_truth_for_tf" value="$(arg use_ground_truth_for_tf)"/>
+     <arg name="use_ground_truth_for_control" value="$(arg use_ground_truth_for_control)"/>
+     <arg name="use_pose_estimation" value="$(arg use_pose_estimation)"/>
+</include>
+
+<!-- Publication of an empty msg of type hector_uav_msgs/TakeoffActionGoal  under the topic /action/takeoff/goal to make the UAV take off-->
+<node pkg="rostopic" type="rostopic" name="takeoffUAV" args="pub /action/takeoff/goal hector_uav_msgs/TakeoffActionGoal '{header: { seq: 0, stamp: { secs: 0, nsecs: 0 }, frame_id: '' }, goal_id: {stamp: { secs: 0, nsecs: 0}, id: ''}, goal: {} }'" output="screen"/> 
+
+<node name="spawn_helipad" pkg="gazebo_ros" type="spawn_model"
+    args="-file $(find bebop_gazebo)/models/marker3/model.sdf
+       -model marker3 -sdf
+       -x 5.0
+       -y -0.0
+       -z 0.3"                          
+    respawn="false" output="screen"/> <!-- initial position of the helipad-->
+
+<node pkg="bebop_gazebo" type="moving_helipad.py" name="moving_helipad" output="screen" >
+      <param name="x_vel" type="double" value="-0.1" />
+      <param name="y_vel" type="double" value="0.0" />
+      <param name="seconds_before_moving" type="double" value="3" />
+</node>
+
+
+</launch>
