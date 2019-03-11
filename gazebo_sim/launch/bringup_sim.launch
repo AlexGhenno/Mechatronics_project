@@ -29,7 +29,7 @@
         controller/attitude
         controller/velocity
         controller/position"/>
-     <arg name="max_xy_vel" value="2.0"/>                        <!--argument used to set the maximum xy velocity of the UAV-->
+     <arg name="max_xy_vel" value="0.5"/>                        <!--argument used to set the maximum xy velocity of the UAV-->
      <arg name="tf_prefix" default="$(arg tf_prefix)"/>
      <arg name="x" default="$(arg x)"/>
      <arg name="y" default="$(arg y)"/>

@@ -8,7 +8,7 @@
     controller/velocity
     controller/attitude
     "/>
-  <arg name="max_xy_vel" default="1.0"/>            <!--Argument added to indicate the maximum xy vel of the UAV -->
+  <arg name="max_xy_vel" default="0.2"/>            <!--Argument added to indicate the maximum xy vel of the UAV -->
 
   <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
 
