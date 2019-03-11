@@ -23,22 +23,20 @@ sudo apt-get install ros-kinetic-hector-localization
 ```
 sudo apt-get install ros-kinetic-hector-slam
 ```
-
 5. Install package hector_models
 ```
 sudo apt-get install ros-kinetic-hector-models
 ```
 
 6. Clone the hector_quadrotor package in your workspace
-```
-git clone https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor.git
-```
+ ```
+ git clone https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor.git
+ ```
+  6.1. Install package hardware_interface
 
-    6.1. Install package hardware_interface
+  6.2. Install package Controller_interface
 
-    6.2. Install package Controller_interface
-
-    6.3. Install package gazebo_ros_control
+  6.3. Install package gazebo_ros_control
 
 7. Install package ar_alvar_track
 
