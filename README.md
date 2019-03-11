@@ -75,9 +75,14 @@ pip install untangle
 
 
 Notes:
-You may also install the joy package.
+You may also have to install the joy package.
 
 How to install deb packages ubuntu    
 ```
 sudo dpkg -i DEB_PACKAGE
 ```
+
+
+Notes regarding the simulation:
+
+- The maximum speed of the UAV is set through the parameter max_xy_vel, initialized in the launch file bringup_sim.launch
