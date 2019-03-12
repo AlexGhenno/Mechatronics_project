@@ -45,6 +45,7 @@ def init():
     elif mode == 1:
         master_marker = rospy.get_param("~marker_index", '3')
         marker_size = rospy.get_param("~marker_size", 5.4)
+
     tf_broadcaster = tf.TransformBroadcaster()
     marker_publisher = rospy.Publisher('ar_helipad_marker', Marker, queue_size=1)
     rospy.Subscriber("tf", TFMessage, tf_callback)
@@ -58,12 +59,12 @@ def tf_callback(tf2):
         if tf.child_frame_id == 'ar_marker_' + master_marker:
             if mode == 0:
                 tf_broadcaster.sendTransform(
-                    (width / 2 + top_left_x, -height / 2 + top_left_y, 0),
+                    (width / 2 + top_left_x, -height / 2 + top_left_y, 0),  #since there are two tags in the corners, a point in the center of the helipad is calculated here
                     (0, 0, 0, 1.0),
                     rospy.Time.now(),
                     'helipad',
-                    'ar_marker_' + master_marker)
-
+                    'ar_marker_' + master_marker)       #Member function definition: StampedTransform (const tf::Transform &input, const ros::Time &timestamp, const std::string &frame_id, const std::string &child_frame_id)
+                                                        # The transform is calculated from a frame 'helipad' (created) to the frame ar_marker_3 
                 marker = Marker()
                 marker.header.frame_id = 'ar_marker_' + master_marker
                 marker.header.stamp = rospy.Time.now()
