@@ -19,7 +19,7 @@ py = 0
 path_length = 5
 path_width = 2
 t_step = 0.05
-path_resolution = 0.001
+path_resolution = 0.0005
 
 
 model_name = ""
