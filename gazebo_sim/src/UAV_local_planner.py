@@ -20,8 +20,10 @@ z_tolerance = 0.0
 xy_tolerance = 0.0
 max_trans_vel = 0.5
 min_trans_vel = 0.1
+xy_landing_tolerance = 0.2
 
 landed = False
+yaw_diff2 = 0.0
 
 tf_ = None
 goal_prediction_pose = None
@@ -49,7 +51,7 @@ def init():
     cmd_vel_pub = rospy.Publisher('UAV/cmd_vel', Twist, queue_size=1)
     land_pub = rospy.Publisher('action/landing/goal', LandingActionGoal, queue_size=1)
     rospy.Subscriber('ground_truth/state', Odometry, odom_callback)
-    rospy.Subscriber('aerial_global_planner/plan', Path, path_callback)
+    rospy.Subscriber('aerial_global_planner/plan', Path, path_callback) #global planner predicted goal subscribtion
     tf_ = TransformListener()
     rospy.Subscriber('tf', TFMessage, tf_callback)
 
@@ -59,23 +61,23 @@ def init():
 def odom_callback(odom):
     global cmd_vel_pub, robot_goal, land_pub
     global max_trans_vel, min_trans_vel
-    global landed, goal_prediction_pose, xy_tolerance, z_tolerance
+    global landed, goal_prediction_pose, xy_tolerance, z_tolerance, yaw_diff2
     twist = Twist()
     if not landed and robot_goal != None:
         d = 0.0
-        curr_pos = odom.pose.pose.position
+        curr_pos = odom.pose.pose.position          #gets the current position of the UAV (from base_link to world frames)
         curr_or = odom.pose.pose.orientation
         if robot_goal != None:
-            d = distance(curr_pos.x, curr_pos.y, robot_goal.position.x, robot_goal.position.y)
+            d = distance(curr_pos.x, curr_pos.y, robot_goal.position.x, robot_goal.position.y)  #computes the xy plane distance between the UAV current position and the goal predicted
             d2 = 1000
             zd2 = 1000
             if goal_prediction_pose != None:
-                d2 = distance(curr_pos.x, curr_pos.y, goal_prediction_pose.position.x, goal_prediction_pose.position.y)
+                d2 = distance(curr_pos.x, curr_pos.y, goal_prediction_pose.position.x, goal_prediction_pose.position.y) #computes the xy plane distance between the UAV current position and the goal position frame. This frame was created by the global planner
                 zd2 = curr_pos.z - goal_prediction_pose.position.z
             zd = abs(curr_pos.z - robot_goal.position.z)
             print d2, ' ' ,zd2                                 #line to print the xy and z distance measured from the UAV to the helipad.
 
-            if (d2 < 0.23 and zd2 < z_tolerance and zd2 > 0.0):    #condition to make the UAV to land. 0.2 is the magnitude tolerance distance between the UAV and the platform
+            if (d2 < xy_landing_tolerance and zd2 < z_tolerance and zd2 > 0.0):    #condition for landing the UAV. 0.2 is the magnitude tolerance distance between the UAV and the platform
                 empty = LandingActionGoal()
                 empty.header.seq=0
                 empty.header.stamp.secs=0
@@ -99,33 +101,43 @@ def odom_callback(odom):
                 # polar coordinates r,θ
                 # θ = yaw_diff2
                 # r = d
+                #estimated robot velocities 
                 x_diff = 2 * d * math.cos(yaw_diff2)
                 y_diff = 2 * d * math.sin(yaw_diff2)
                 z_diff = 2 * (robot_goal.position.z - (curr_pos.z - 0.28)) # up is positive  // 0.25 ensures that the robot never gets closer than 30cm to the platform in z
 
-                x_diff = max(min_trans_vel, min(x_diff,max_trans_vel))
+                x_diff = max(min_trans_vel, min(x_diff,max_trans_vel))  #retuns the maximum velocity (saturation of the output between the min and max allowed velocities). These velocities are different from the ctlr velocities
                 y_diff = max(min_trans_vel, min(y_diff,max_trans_vel))
 
                 twist.linear.x = x_diff
                 twist.linear.y = y_diff
                 twist.linear.z = z_diff
                 twist.angular.z = yaw_diff2*10
-    cmd_vel_pub.publish(twist)
+
+    else:
+        if yaw_diff2 >= 0:
+            twist.angular.z = 0.1
+        else:
+            twist.angular.z = -0.1
+        if odom.pose.pose.position.z < 0.3:
+            twist.linear.z = 0.5
+
+    cmd_vel_pub.publish(twist)                  # cmd velocity publication to move the UAV! 
 
 def path_callback(path):
     global robot_goal
     if len(path.poses) > 0:
-        robot_goal = path.poses[0].pose
+        robot_goal = path.poses[0].pose     #gets the goal position from the global planner
     else:
-        robot_goal = None
+        robot_goal = None       #an empty pose msg for the goal was received, do not move the UAV
 
 def tf_callback(tf2):
     global goal_prediction_pose, tf_
     try:
         t = tf_.getLatestCommonTime('/odom', '/goal_prediction')
-        position, quaternion = tf_.lookupTransform('/odom', '/goal_prediction', t)
+        position, quaternion = tf_.lookupTransform('/odom', '/goal_prediction', t) #gets the transform from odom to the goal predicted
         goal_prediction_pose = Pose()
-        goal_prediction_pose.position.x = position[0]
+        goal_prediction_pose.position.x = position[0]       
         goal_prediction_pose.position.y = position[1]
         goal_prediction_pose.position.z = position[2]
     except Exception as e:

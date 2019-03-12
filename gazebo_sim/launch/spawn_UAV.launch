@@ -9,6 +9,8 @@
     controller/attitude
     "/>
   <arg name="max_xy_vel" default="0.2"/>            <!--Argument added to indicate the maximum xy vel of the UAV -->
+  <arg name="max_z_vel" default="0.2"/>
+  <arg name="max_yaw_rate" default="3.14"/>
 
   <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
 
@@ -81,6 +83,8 @@ libhector_gazebo_ros_imu
   </include>
 
   <rosparam param="controller/velocity/max_xy" subst_value="True">$(arg max_xy_vel)</rosparam>  <!--Tag to set the value of the maximum xy velocity of the UAV-->
+  <rosparam param="controller/velocity/z/max" subst_value="True">$(arg max_z_vel)</rosparam>
+  <rosparam param="/controller/attitude/yawrate/max" subst_value="True">$(arg max_yaw_rate)</rosparam>
 
   <!-- load aerodynamic and motor parameters -->
   <arg name="motors" default="robbe_2827-34_epp1045" />

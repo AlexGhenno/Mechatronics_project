@@ -30,6 +30,9 @@
         controller/velocity
         controller/position"/>
      <arg name="max_xy_vel" value="0.5"/>                        <!--argument used to set the maximum xy velocity of the UAV-->
+     <arg name="max_z_vel" value="1.5"/>
+     <arg name="max_yaw_rate" value="0.75"/>            <!-- by default the controller.yaml file sets this parameter to 3.14 (half a revolution per second) -->            
+
      <arg name="tf_prefix" default="$(arg tf_prefix)"/>
      <arg name="x" default="$(arg x)"/>
      <arg name="y" default="$(arg y)"/>

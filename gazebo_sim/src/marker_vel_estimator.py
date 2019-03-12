@@ -19,8 +19,8 @@ def init():
     global targeted_tf, tf_, sliding_window_sz
     global p_v_pub, latest_common_time
     rospy.init_node('tf_velocity_estimator')
-    targeted_tf = rospy.get_param('~targeted_tf', 'helipad')	#read the targeted tf, be default is the helipad frame generated in the 								ar_helipad.py node
-    sliding_window_sz = rospy.get_param('~sliding_window_sz', 10)
+    targeted_tf = rospy.get_param('~targeted_tf', 'helipad')	#read the targeted tf, be default is the helipad frame generated in the ar_helipad.py node when detecting the marker
+    sliding_window_sz = rospy.get_param('~sliding_window_sz', 10)   #defines the size of the transformations number used to estimate the helipad's velocity
     tf_ = TransformListener()
     latest_common_time = rospy.Time.now()
     rospy.Subscriber('tf', TFMessage, tf_callback)
@@ -48,11 +48,11 @@ def tf_callback(tf2):
             ps.pose.orientation.y = quaternion[1]
             ps.pose.orientation.z = quaternion[2]
             ps.pose.orientation.w = quaternion[3]
-            sliding_window.append(ps)
+            sliding_window.append(ps)               #append the transformation from /odom to the marker frame in the sliding windows empty array
             if len(sliding_window) >= sliding_window_sz:
-                del sliding_window[0]
+                del sliding_window[0]               # when the array already contains 10 elements (10 transformations) the first element is deleted. This creates the effect of a shift register with 10 elements
                 if len(sliding_window_v) >= sliding_window_sz:
-                    del sliding_window_v[0]
+                    del sliding_window_v[0]         
 
             v = Velocity()
             if len(sliding_window) > 1:			#calculate the velocities when a second transformation is received
@@ -64,9 +64,9 @@ def tf_callback(tf2):
                     v.vx = dx / dt
                     v.vy = dy / dt
                     v.vz = dz / dt
-                    sliding_window_v.append(v)
+                    sliding_window_v.append(v)  #it appends the calculated velocites (x,y,z), which is limited to 10 elements
             else:
-                sliding_window_v.append(v)
+                sliding_window_v.append(v)      #at the first run, an empty element v is appended to the empty sliding_window_v array
     except Exception as e:
         pass
 
@@ -74,7 +74,7 @@ def tf_callback(tf2):
         pvmsg = PosesAndVelocities()
         pvmsg.latest_poses = sliding_window
         pvmsg.latest_velocities = sliding_window_v
-        p_v_pub.publish(pvmsg)
+        p_v_pub.publish(pvmsg)          #both arrays containing the latest 10 poses and velocities of the helipad are published
 
 if __name__ == '__main__':
     init() 
