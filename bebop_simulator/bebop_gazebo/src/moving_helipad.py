@@ -16,10 +16,10 @@ px = 3
 py = 0
 
 #trajectory dimensions
-path_length = 5
-path_width = 2
+path_length = 3.5
+path_width = 3.5
 t_step = 0.05
-path_resolution = 0.0005
+path_resolution = 0.005
 
 
 model_name = ""
@@ -58,14 +58,19 @@ def modelStatesCallback(msg):
     '''  
     #rate.sleep()
     now = rospy.get_rostime()
-    if (now.nsecs % 1000000) == 0:
-        if t>6300:
+    if (now.nsecs % 10000000) == 0:          #this line sets the speed of the helipad
+        if t>630:
             t = 0
         else:
             t = t + t_step
-        
+    
+    # Infinity sign path   
+    #px = path_length*(math.cos(path_resolution*t))
+    #py = path_width*(math.sin(2*path_resolution*t))   
+
     px = path_length*(math.cos(path_resolution*t))
-    py = path_width*(math.sin(2*path_resolution*t))   
+    py = path_width*(math.sin(path_resolution*t))
+
 
     if index_of_interest >= 0:
         model_state = ModelState()
