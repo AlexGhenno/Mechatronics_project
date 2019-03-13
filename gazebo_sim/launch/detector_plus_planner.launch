@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+ <include file="$(find gazebo_sim)/launch/helipad_detector.launch"/>
+ <include file="$(find gazebo_sim)/launch/startup_nodes.launch"/>
+
+ <node pkg="rviz" type="rviz" name="rviz" output="screen" />
+ </launch>

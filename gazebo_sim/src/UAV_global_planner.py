@@ -14,7 +14,7 @@ path_pub = None
 max_velocity = 1 # m/s
 robot_pose = None
 tf_broadcaster = None
-future_horizon = 10          #time in seconds used as the max future horizon to predict the helipad's pose 
+future_horizon = 3          #time in seconds used as the max future horizon to predict the helipad's pose 
 
 def init():
     global path_pub, tf_, max_velocity, tf_broadcaster

@@ -20,7 +20,7 @@ def init():
     global p_v_pub, latest_common_time
     rospy.init_node('tf_velocity_estimator')
     targeted_tf = rospy.get_param('~targeted_tf', 'helipad')	#read the targeted tf, be default is the helipad frame generated in the ar_helipad.py node when detecting the marker
-    sliding_window_sz = rospy.get_param('~sliding_window_sz', 10)   #defines the size of the transformations number used to estimate the helipad's velocity
+    sliding_window_sz = rospy.get_param('~sliding_window_sz', 5)   #defines the size of the transformations number used to estimate the helipad's velocity
     tf_ = TransformListener()
     latest_common_time = rospy.Time.now()
     rospy.Subscriber('tf', TFMessage, tf_callback)
