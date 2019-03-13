@@ -44,7 +44,7 @@ def init():
         top_left_y /= 100
     elif mode == 1:
         master_marker = rospy.get_param("~marker_index", '3')
-        marker_size = rospy.get_param("~marker_size", 5.4)
+        marker_size = rospy.get_param("~marker_size", 5.4)  #5.4
 
     tf_broadcaster = tf.TransformBroadcaster()
     marker_publisher = rospy.Publisher('ar_helipad_marker', Marker, queue_size=1)
