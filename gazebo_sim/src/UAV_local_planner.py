@@ -24,6 +24,14 @@ xy_landing_tolerance = 0.29
 
 landed = False
 yaw_diff2 = 0.0
+x_diff = 0.0
+y_diff = 0.0
+goal_history = [Pose()]
+goal_history[0].position.x = 0.0
+goal_history[0].position.y = 0.0
+vx_history = [0]
+vy_history = [0]
+
 
 tf_ = None
 goal_prediction_pose = None
@@ -45,7 +53,7 @@ def init():
     max_trans_vel = rospy.get_param('~max_trans_vel', 5.0)
     min_trans_vel = rospy.get_param('~min_trans_vel', 0.1)
     xy_tolerance = rospy.get_param('~xy_tolerance', 0.05)
-    z_tolerance = rospy.get_param('~z_tolerance', 0.3)        # minimum distance in z direction to land  ¡if the z ofset goal coord. is modified, change this tolerance too!
+    z_tolerance = rospy.get_param('~z_tolerance', 0.35)        # minimum distance in z direction to land  ¡if the z ofset goal coord. is modified, change this tolerance too!
     #theta_tolerance = rospy.get_param() TODO
     #pos_tolerance = rospy.get_param() TODO
     cmd_vel_pub = rospy.Publisher('UAV/cmd_vel', Twist, queue_size=1)
@@ -59,9 +67,9 @@ def init():
         rospy.spin()
 
 def odom_callback(odom):
-    global cmd_vel_pub, robot_goal, land_pub
+    global cmd_vel_pub, robot_goal, land_pub, goal_history, vx_history, vy_history
     global max_trans_vel, min_trans_vel
-    global landed, goal_prediction_pose, xy_tolerance, z_tolerance, yaw_diff2
+    global landed, goal_prediction_pose, xy_tolerance, z_tolerance, yaw_diff2, d_left
     twist = Twist()
     if not landed and robot_goal != None:
         d = 0.0
@@ -104,30 +112,69 @@ def odom_callback(odom):
                 #estimated robot velocities 
                 x_diff = d * math.cos(yaw_diff2)
                 y_diff = d * math.sin(yaw_diff2)
-                z_diff = (robot_goal.position.z - (curr_pos.z - 0.25)) # up is positive  // 0.25 ensures that the robot never gets closer than 30cm to the platform in z
+                z_diff = 2*(robot_goal.position.z - (curr_pos.z - 0.25)) # up is positive  // 0.25 ensures that the robot never gets closer than 30cm to the platform in z
 
                 x_diff = max(min_trans_vel, min(x_diff,max_trans_vel))  #retuns the maximum velocity (saturation of the output between the min and max allowed velocities). These velocities are different from the ctlr velocities
                 y_diff = max(min_trans_vel, min(y_diff,max_trans_vel))
+                '''
+                if len(vx_history) >= 3:
+                    del vx_history[0]              #remove the first goal stored
+                    del vy_history[0]
+                    vx_history.append(x_diff)
+                    vy_history.append(y_diff)
+                else:
+                    vx_history.append(x_diff)
+                    vy_history.append(y_diff)
+                    '''
 
                 twist.linear.x = x_diff
                 twist.linear.y = y_diff
                 twist.linear.z = z_diff
                 twist.angular.z = yaw_diff2*10
 
-    #else:
-    #    if yaw_diff2 >= 0:
-    #        twist.angular.z = 0.06
-    #    else:
-    #        twist.angular.z = -0.06
+    '''
+    elif goal_history != None and not landed:
+        curr_pos = odom.pose.pose.position         
+        curr_or = odom.pose.pose.orientation
+        d_left = distance(curr_pos.x, curr_pos.y, goal_history[-1].position.x, goal_history[-1].position.y)
+        
+        if d_left < 0.6:
+            twist.linear.x = vx_history[-1]
+            twist.linear.y = vy_history[-1]
+            #twist.linear.z = z_diff
+            #twist.angular.z = yaw_diff2*10
+        elif d_left < 0.2:
+                empty = LandingActionGoal()
+                empty.header.seq=0
+                empty.header.stamp.secs=0
+                empty.header.frame_id=''
+                empty.goal_id.stamp.secs=0
+                empty.goal_id.stamp.nsecs=0
+                empty.goal_id.id=''
+                land_pub.publish(empty) 
+                landed = True
+                return
+'''
+        #if yaw_diff2 >= 0:
+        #    twist.angular.z = 0.1
+        #else:
+        #    twist.angular.z = -0.1
     #    if odom.pose.pose.position.z < 0.3:
     #        twist.linear.z = 0.5
 
     cmd_vel_pub.publish(twist)                  # cmd velocity publication to move the UAV! 
 
 def path_callback(path):
-    global robot_goal
+    global robot_goal, goal_history
     if len(path.poses) > 0:
         robot_goal = path.poses[0].pose     #gets the goal position from the global planner
+        '''
+        if len(goal_history) >= 10:
+            del goal_history[0]              #remove the first goal stored
+            goal_history.append(robot_goal)
+        else:
+            goal_history.append(robot_goal)
+        '''
     else:
         robot_goal = None       #an empty pose msg for the goal was received, do not move the UAV
 
