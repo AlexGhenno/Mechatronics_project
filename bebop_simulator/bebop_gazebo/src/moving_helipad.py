@@ -19,7 +19,7 @@ py = 0
 path_length = 3.5
 path_width = 3.5
 t_step = 0.05
-path_resolution = 0.005
+path_resolution = 0.005             # 0.005 for slow motion 
 
 
 model_name = ""
