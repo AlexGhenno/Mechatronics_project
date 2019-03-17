@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+ <!--<include file="$(find bebop_gazebo)/launch/bebop_moving_helipad.launch"/>
+ <include file="$(find ar_helipad)/launch/bebop_helipad_individual.launch"/>-->
+ <node name="marker_vel_estimator" pkg="gazebo_sim" type="marker_vel_estimator.py" output="screen"/>
+ <node name="aerial_local_planner" pkg="gazebo_sim" type="UAV_local_planner.py" output="screen"/>
+ <node name="aerial_global_planner" pkg="gazebo_sim" type="UAV_global_planner.py" output="screen"/>
+</launch>
+ 
+
+
+

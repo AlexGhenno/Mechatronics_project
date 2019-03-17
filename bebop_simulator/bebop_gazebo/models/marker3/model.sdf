@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="marker3">
+    <link name="link">
+      <gravity>0</gravity>
+
+      <collision name="collision_marker3">
+        <pose>0 0 -0.15 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>1.0 1.0 0.3</size>
+          </box>
+        </geometry>
+        
+        <surface>
+         <friction>
+          <ode>
+           <mu>1.0</mu>   <!-- Coulomb friction coefficient for the first friction direction-->
+           <mu2>1.0</mu2>
+           <slip1>1.0</slip1>   <!-- Coulomb friction coefficient for the first friction direction-->
+           <slip2>1.0</slip2>
+          </ode>
+         </friction>
+        </surface>
+
+      </collision>
+      <visual name="visual_marker3">
+        <pose>0 0 0.0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.52 0.52 0.01</size>
+          </box>
+        </geometry>
+        
+        <material>
+          <script>
+            <uri>model://ar_helipad/materials/scripts</uri>
+            <uri>model://ar_helipad/materials/textures</uri>
+            <name>Marker3/Diffuse</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
