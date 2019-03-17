@@ -11,7 +11,7 @@ from tf2_msgs.msg import TFMessage
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Twist
 from hector_uav_msgs.msg import LandingActionGoal
-
+#####alrsmgiaeniofrgunadufinbidua
 robot_goal = None
 cmd_vel_pub = None
 land_pub = None
