@@ -6,6 +6,3 @@ Git clone the _gazebo_sim_, _bebop_simulator_ and _ar_helipad_ package to keep u
 
 Refer to the Wiki tab in this repository to get info. regarding the intallation of the required packages to run the simulation.
 
-
-Aqui haciendo la prueba
-
