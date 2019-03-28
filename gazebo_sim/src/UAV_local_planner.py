@@ -20,7 +20,7 @@ z_tolerance = 0.0
 xy_tolerance = 0.0
 max_trans_vel = 0.5
 min_trans_vel = 0.1
-xy_landing_tolerance = 0.29
+xy_landing_tolerance = 0.1
 
 landed = False
 yaw_diff2 = 0.0
@@ -112,7 +112,7 @@ def odom_callback(odom):
                 #estimated robot velocities 
                 x_diff = d * math.cos(yaw_diff2)
                 y_diff = d * math.sin(yaw_diff2)
-                z_diff = 2*(robot_goal.position.z - (curr_pos.z - 0.25)) # up is positive  // 0.25 ensures that the robot never gets closer than 30cm to the platform in z
+                z_diff = 2*(robot_goal.position.z - (curr_pos.z - 0.18)) # up is positive  // 0.25 ensures that the robot never gets closer than 30cm to the platform in z
 
                 x_diff = max(min_trans_vel, min(x_diff,max_trans_vel))  #retuns the maximum velocity (saturation of the output between the min and max allowed velocities). These velocities are different from the ctlr velocities
                 y_diff = max(min_trans_vel, min(y_diff,max_trans_vel))
@@ -155,10 +155,10 @@ def odom_callback(odom):
                 landed = True
                 return
 '''
-        #if yaw_diff2 >= 0:
-        #    twist.angular.z = 0.1
-        #else:
-        #    twist.angular.z = -0.1
+    if yaw_diff2 >= 0:
+        twist.angular.z = 0.2
+    else:
+        twist.angular.z = -0.2
     #    if odom.pose.pose.position.z < 0.3:
     #        twist.linear.z = 0.5
 

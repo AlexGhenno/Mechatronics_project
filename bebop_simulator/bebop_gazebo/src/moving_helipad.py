@@ -58,8 +58,8 @@ def modelStatesCallback(msg):
     '''  
     #rate.sleep()
     now = rospy.get_rostime()
-    if (now.nsecs % 10000000) == 0:          #this line sets the speed of the helipad
-        if t>630:
+    if (now.nsecs % 100000) == 0:          #this line sets the speed of the helipad
+        if t>1260:
             t = 0
         else:
             t = t + t_step

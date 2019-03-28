@@ -15,8 +15,8 @@
         <surface>
          <friction>
           <ode>
-           <mu>1.0</mu>   <!-- Coulomb friction coefficient for the first friction direction-->
-           <mu2>1.0</mu2>
+           <mu>5.0</mu>   <!-- Coulomb friction coefficient for the first friction direction-->
+           <mu2>5.0</mu2>
            <slip1>1.0</slip1>   <!-- Coulomb friction coefficient for the first friction direction-->
            <slip2>1.0</slip2>
           </ode>
