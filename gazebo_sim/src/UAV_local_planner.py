@@ -143,8 +143,9 @@ def odom_callback(odom):
         curr_or = odom.pose.pose.orientation
         d_left = distance(curr_pos.x, curr_pos.y, goal_history[-1].position.x, goal_history[-1].position.y)
         z_diff = 2*(goal_history[-1].position.z - (curr_pos.z - 0.18))
-        
-        if d_left < 0.6:
+        print 'Marker lost, landing in the last goal predicted (', goal_history[-1].position.x, goal_history[-1].position.y, goal_history[-1].position.z, ')' 
+        print d_left
+        if d_left < 3.0:
             twist.linear.x = vx_history[-1]
             twist.linear.y = vy_history[-1]
             twist.linear.z = z_diff
