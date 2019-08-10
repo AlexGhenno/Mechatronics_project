@@ -47,18 +47,10 @@ def modelStatesCallback(msg):
         if msg.name[i] == model_name:		#way to ensure that the index actually corresponds to the helipad's index
             index_of_interest = i
             break
-    '''
-    if t >=310.0:
-    	t =0.0
-    else:
-	    t=i+1
-        px=math.cos(0.2*t)
-        py=math.sin(0.2*t)
-        print(px)
-    '''  
+    
     #rate.sleep()
     now = rospy.get_rostime()
-    if (now.nsecs % 100000) == 0:          #this line sets the speed of the helipad
+    if (now.nsecs % 1000000) == 0:          #this line sets the speed of the helipad
         if t>1260:
             t = 0
         else:
@@ -76,17 +68,15 @@ def modelStatesCallback(msg):
         model_state = ModelState()
         model_state.model_name = model_name
         #model_state.pose = msg.pose[index_of_interest]
-        model_state.twist = msg.twist[index_of_interest]
+        #model_state.twist = msg.twist[index_of_interest]
         #twist = Twist()
-        #px = 2
-        #py = px
+        #twist.linear.x = 1.0
+        #twist.angular.z = 1.0
+        
         pose = Pose()
         pose.position.x = px
         pose.position.y =py
-
-	    #twist.linear.x=x_vel
-	    #twist.linear.y=y_vel
-
+        
         #if msg.twist[index_of_interest] != twist:
         if msg.pose[index_of_interest] != pose:
             #model_state.twist = twist
