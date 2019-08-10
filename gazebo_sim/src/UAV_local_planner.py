@@ -84,7 +84,8 @@ def odom_callback(odom):
                 d2 = distance(curr_pos.x, curr_pos.y, goal_prediction_pose.position.x, goal_prediction_pose.position.y) #computes the xy plane distance between the UAV current position and the goal position frame. This frame was created by the global planner
                 zd2 = curr_pos.z - goal_prediction_pose.position.z
             zd = abs(curr_pos.z - robot_goal.position.z)
-            print d2, ' ' ,zd2, ' ' , goal_flag                                 #line to print the xy and z distance measured from the UAV to the helipad.
+            # print d2, ' ' ,zd2, ' ' , goal_flag      #print the xy and z distance measured from the UAV to the helipad.
+            print d2, ' ' ,zd2
 
             if (d2 < xy_landing_tolerance and zd2 < z_tolerance and zd2 > 0.0):    #condition for landing the UAV. 0.2 is the magnitude tolerance distance between the UAV and the platform
                 empty = LandingActionGoal()
@@ -96,7 +97,7 @@ def odom_callback(odom):
                 empty.goal_id.id=''
                 land_pub.publish(empty) 
                 landed = True
-                goal_flag = False
+                # goal_flag = False
                 return
             if not (d <= xy_tolerance and zd < z_tolerance and zd2):
                 (gr, gp, gy) = tf.transformations.euler_from_quaternion([robot_goal.orientation.x, robot_goal.orientation.y, robot_goal.orientation.z, robot_goal.orientation.w])
@@ -134,13 +135,14 @@ def odom_callback(odom):
                 twist.linear.z = z_diff
                 twist.angular.z = yaw_diff2*10
 
-                goal_flag = True
+                # goal_flag = True
 
 
-    elif goal_history != None and not landed:
+    elif len(goal_history) >= 2  and not landed:
         curr_pos = odom.pose.pose.position         
         curr_or = odom.pose.pose.orientation
         d_left = distance(curr_pos.x, curr_pos.y, goal_history[-1].position.x, goal_history[-1].position.y)
+        z_diff = 2*(goal_history[-1].position.z - (curr_pos.z - 0.18))
         
         if d_left < 0.6:
             twist.linear.x = vx_history[-1]
@@ -172,8 +174,8 @@ def path_callback(path):
     global robot_goal, goal_history
     if len(path.poses) > 0:
         robot_goal = path.poses[0].pose     #gets the goal position from the global planner
-        
-        if len(goal_history) >= 5:true
+        #print(size(goal_history))
+        if len(goal_history) >= 5:
             del goal_history[0]              #remove the first goal stored
             goal_history.append(robot_goal)
         else:
