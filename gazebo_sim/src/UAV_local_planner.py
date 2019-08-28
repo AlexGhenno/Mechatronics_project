@@ -37,9 +37,10 @@ tf_ = None
 goal_prediction_pose = None
 #rospy.set_param('controller/velocity/max_xy',1.0)       #Set the parameter to adjust the maximum xy velocity of the UAV
 
+# get the uclidea distance between two points
 def distance(x1, y1, x2, y2):
     return math.sqrt( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
-
+# calculate the yaw angle 
 def lookAt(robotx, roboty, helix, heliy):
     dx = helix - robotx
     dy = heliy - roboty
@@ -67,22 +68,25 @@ def init():
     while not rospy.is_shutdown():
         rospy.spin()
 
+
+
 def odom_callback(odom):
     global cmd_vel_pub, robot_goal, land_pub, goal_history, vx_history, vy_history
     global max_trans_vel, min_trans_vel
-    global landed, goal_prediction_pose, xy_tolerance, z_tolerance, yaw_diff2, d_left
+    global landed, goal_prediction_pose, xy_tolerance, z_tolerance, yaw_diff2, d_left, zd_left
     twist = Twist()
     if not landed and robot_goal != None:
         d = 0.0
-        curr_pos = odom.pose.pose.position          #gets the current position of the UAV (from base_link to world frames)
+        curr_pos = odom.pose.pose.position          #gets the current pose of the UAV (from base_link to world frames)
         curr_or = odom.pose.pose.orientation
         if robot_goal != None:
             d = distance(curr_pos.x, curr_pos.y, robot_goal.position.x, robot_goal.position.y)  #computes the xy plane distance between the UAV current position and the goal predicted
-            d2 = 1000
+            d2 = 1000   #???
             zd2 = 1000
             if goal_prediction_pose != None:
                 d2 = distance(curr_pos.x, curr_pos.y, goal_prediction_pose.position.x, goal_prediction_pose.position.y) #computes the xy plane distance between the UAV current position and the goal position frame. This frame was created by the global planner
                 zd2 = curr_pos.z - goal_prediction_pose.position.z
+            #calculate z distance 
             zd = abs(curr_pos.z - robot_goal.position.z)
             # print d2, ' ' ,zd2, ' ' , goal_flag      #print the xy and z distance measured from the UAV to the helipad.
             print d2, ' ' ,zd2
@@ -105,7 +109,7 @@ def odom_callback(odom):
                 yaw_diff = gy - ry
 
                 yaw_diff /= 1
-
+                # yaw angle to make the UAV face towards the helipad
                 straight_yaw = lookAt(curr_pos.x, curr_pos.y, robot_goal.position.x, robot_goal.position.y)
                 yaw_diff2 = straight_yaw - ry
 
@@ -120,6 +124,7 @@ def odom_callback(odom):
                 x_diff = max(min_trans_vel, min(x_diff,max_trans_vel))  #retuns the maximum velocity (saturation of the output between the min and max allowed velocities). These velocities are different from the ctlr velocities
                 y_diff = max(min_trans_vel, min(y_diff,max_trans_vel))
                 
+                # save the history of the three latest velocities
                 if len(vx_history) >= 3:
                     del vx_history[0]              #remove the first goal stored
                     del vy_history[0]
@@ -129,7 +134,7 @@ def odom_callback(odom):
                     vx_history.append(x_diff)
                     vy_history.append(y_diff)
                     
-
+                #set linear and angular velocities
                 twist.linear.x = x_diff
                 twist.linear.y = y_diff
                 twist.linear.z = z_diff
@@ -142,32 +147,33 @@ def odom_callback(odom):
         curr_pos = odom.pose.pose.position         
         curr_or = odom.pose.pose.orientation
         d_left = distance(curr_pos.x, curr_pos.y, goal_history[-1].position.x, goal_history[-1].position.y)
-        z_diff = 2*(goal_history[-1].position.z - (curr_pos.z - 0.18))
+        zd_left = 2*(goal_history[-1].position.z - (curr_pos.z - 0.18))
         print 'Marker lost, landing in the last goal predicted (', goal_history[-1].position.x, goal_history[-1].position.y, goal_history[-1].position.z, ')' 
         print d_left
-        if d_left < 3.0:
-            twist.linear.x = vx_history[-1]
-            twist.linear.y = vy_history[-1]
-            twist.linear.z = z_diff
-            twist.angular.z = yaw_diff2*10
-        elif d_left < 0.2:
-                empty = LandingActionGoal()
-                empty.header.seq=0
-                empty.header.stamp.secs=0
-                empty.header.frame_id=''
-                empty.goal_id.stamp.secs=0
-                empty.goal_id.stamp.nsecs=0
-                empty.goal_id.id=''
-                land_pub.publish(empty) 
-                landed = True
-                return
+        print zd_left
+        
+        twist.linear.x = vx_history[-1]
+        twist.linear.y = vy_history[-1]
+        twist.linear.z = zd_left
+        twist.angular.z = yaw_diff2*10
+        if d_left < 0.4:
+            empty = LandingActionGoal()
+            empty.header.seq=0
+            empty.header.stamp.secs=0
+            empty.header.frame_id=''
+            empty.goal_id.stamp.secs=0
+            empty.goal_id.stamp.nsecs=0
+            empty.goal_id.id=''
+            land_pub.publish(empty) 
+            landed = True
+            return
 
-    '''if yaw_diff2 >= 0:
-        twist.angular.z = 0.2
-    else:
-        twist.angular.z = -0.2
+    # if yaw_diff2 >= 0:
+    #     twist.angular.z = 0.2
+    # else:
+    #     twist.angular.z = -0.2
     #    if odom.pose.pose.position.z < 0.3:
-    #        twist.linear.z = 0.5'''
+    #        twist.linear.z = 0.5
 
     cmd_vel_pub.publish(twist)                  # cmd velocity publication to move the UAV! 
 
