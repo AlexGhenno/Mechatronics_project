@@ -50,12 +50,13 @@ def modelStatesCallback(msg):
     
     #rate.sleep()
     now = rospy.get_rostime()
-    vel_prm = rospy.get_param("helipad_vel", 600000)
+    vel_prm = rospy.get_param("helipad_vel", 50000)
     if (now.nsecs % vel_prm) == 0:          #this line sets the speed of the helipad
         if t>1260:
             t = 0
         else:
-            t = t + t_step
+            # t = t + t_step
+            t = t + rospy.get_param("time_step", 0.05)
     
     # Infinity sign path   
     #px = path_length*(math.cos(path_resolution*t))

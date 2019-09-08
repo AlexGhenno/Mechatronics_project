@@ -168,12 +168,12 @@ def odom_callback(odom):
             landed = True
             return
 
-    # if yaw_diff2 >= 0:
-    #     twist.angular.z = 0.2
+    if yaw_diff2 >= 0:
+        twist.angular.z = 0.2
     # else:
     #     twist.angular.z = -0.2
-    #    if odom.pose.pose.position.z < 0.3:
-    #        twist.linear.z = 0.5
+    #     if odom.pose.pose.position.z < 0.3:
+    #         twist.linear.z = 0.5
 
     cmd_vel_pub.publish(twist)                  # cmd velocity publication to move the UAV! 
 
