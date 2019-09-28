@@ -48,7 +48,7 @@
 <node name="spawn_helipad" pkg="gazebo_ros" type="spawn_model"
     args="-file $(find bebop_gazebo)/models/marker3/model.sdf
        -model marker3 -sdf
-       -x 3.5
+       -x 1.5
        -y -0.0
        -z 0.3"                          
     respawn="false" output="screen"/> <!-- initial position of the helipad-->
