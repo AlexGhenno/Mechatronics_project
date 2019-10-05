@@ -16,8 +16,8 @@ px = 3
 py = 0
 
 #trajectory dimensions
-path_length = 1.5
-path_width = 1.5
+path_length = 4
+path_width = 4
 t_step = 0.05
 path_resolution = 0.005             # 0.005 for slow motion 
 

@@ -48,15 +48,20 @@
 <node name="spawn_helipad" pkg="gazebo_ros" type="spawn_model"
     args="-file $(find bebop_gazebo)/models/marker3/model.sdf
        -model marker3 -sdf
-       -x 1.5
+       -x 3.5
        -y -0.0
        -z 0.3"                          
     respawn="false" output="screen"/> <!-- initial position of the helipad-->
 
+	<node name = "rviz" pkg = "rviz" type = "rviz" output = "screen"/>
+
+
+
 <node pkg="bebop_gazebo" type="moving_helipad.py" name="moving_helipad" output="screen" >
       <param name="x_vel" type="double" value="-0.1" />
       <param name="y_vel" type="double" value="0.0" />
-      <param name="seconds_before_moving" type="double" value="6" />
+      <param name="seconds_before_moving" type="double" value="9" />
 </node>
+
 
 </launch>

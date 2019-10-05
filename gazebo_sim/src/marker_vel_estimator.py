@@ -12,7 +12,7 @@ p_v_pub = None
 targeted_tf = ''
 sliding_window = []
 sliding_window_v = []
-sliding_window_sz = 0
+sliding_window_sz = 20
 latest_common_time = None
 
 def init():

@@ -15,7 +15,7 @@ robot_goal = None
 cmd_vel_pub = None
 land_pub = None
 
-z_tolerance = 0.0
+z_tolerance = 0.0 #let s say z is not important at the moment
 xy_tolerance = 0.0
 max_trans_vel = 0.5
 min_trans_vel = 0.1
