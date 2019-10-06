@@ -53,10 +53,18 @@
        -z 0.3"                          
     respawn="false" output="screen"/> <!-- initial position of the helipad-->
 
-<node pkg="bebop_gazebo" type="moving_helipad.py" name="moving_helipad" output="screen" >
-      <param name="x_vel" type="double" value="-0.1" />
-      <param name="y_vel" type="double" value="0.0" />
-      <param name="seconds_before_moving" type="double" value="6" />
+<!--Path number
+1: Linear in X #Set x_vel = 0.5 for slow motion
+2: Circular  #Set Rate = 20 for slow motion
+3: Infinity  #Set Rate = 40 for slow motion
+4: ZigZag #Set x_vel = y_vel = 0.5 for slow motion  --> 
+
+<node pkg="gazebo_sim" type="moving_helipad.py" name="moving_helipad" output="screen" >
+      <param name="x_vel" type="double" value="1.0" />
+      <param name="y_vel" type="double" value="1.0" />
+      <param name="seconds_before_moving" type="double" value="3" />
+      <param name="Rate" type="double" value="40.0" />
+      <param name="path_number" type="double" value="3.0" />
 </node>
 
 </launch>
