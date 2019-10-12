@@ -105,7 +105,16 @@ def odom_callback(odom):
             #yaw_diff /= 1
             # yaw angle to make the UAV face towards the helipad
             straight_yaw = lookAt(curr_pos.x, curr_pos.y, robot_goal.position.x, robot_goal.position.y)
-            yaw_diff2 = straight_yaw - ry
+            delta_x = robot_goal.position.x - curr_pos.x
+            delta_y = robot_goal.position.y - curr_pos.y
+
+            if delta_x < 0 and delta_y > 0:
+                yaw_diff2 = math.pi - straight_yaw -ry
+            elif delta_x < 0 and delta_y < 0:
+                yaw_diff2 = math.pi + straight_yaw -ry
+            else:
+                yaw_diff2 = straight_yaw - ry
+
             # polar coordinates r,θ
             # θ = yaw_diff2
             # r = d
