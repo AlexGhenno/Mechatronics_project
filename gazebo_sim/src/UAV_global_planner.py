@@ -15,7 +15,7 @@ max_velocity = 1 # m/s
 robot_pose = None
 tf_broadcaster = None
        #time in seconds used as the max future horizon to predict the helipad's pose 
-future_horizon = 2
+future_horizon = 3
 
 # def horizonte(dist_horizonte):
 #     future_horizon = dist_horizonte  

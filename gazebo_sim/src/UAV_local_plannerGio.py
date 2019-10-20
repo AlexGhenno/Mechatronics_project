@@ -60,7 +60,7 @@ def init():
     #theta_tolerance = rospy.get_param() trueTODO
     #pos_tolerance = rospy.get_param() TODO
     cmd_vel_pub = rospy.Publisher('UAV/cmd_vel', Twist, queue_size=1)
-    land_pub = rospy.Publisher('action/emergency/goal', LandingActionGoal, queue_size=1)
+    land_pub = rospy.Publisher('action/landing/goal', LandingActionGoal, queue_size=1)
     rospy.Subscriber('ground_truth/state', Odometry, odom_callback)
     rospy.Subscriber('aerial_global_planner/plan', Path, path_callback) #global planner predicted goal subscribtion
 
@@ -117,22 +117,12 @@ def odom_callback(odom):
             #twist.linear.z = z_diff
             twist.angular.z = yaw_diff2*10
 
-        elif (zd2>0.4):
-            
+        elif (zd2>0):
+        
             twist.linear.x = x_diff
             twist.linear.y = y_diff
             twist.linear.z = z_diff
             twist.angular.z = yaw_diff2*10
-        
-        elif(zd2<=0.4):
-            empty = LandingActionGoal()
-            empty.header.seq=0
-            empty.header.stamp.secs=0
-            empty.header.frame_id=''
-            empty.goal_id.stamp.secs=0
-            empty.goal_id.stamp.nsecs=0
-            empty.goal_id.id=''
-            land_pub.publish(empty)
 
         # elif (zd2 >= 0 and zd2<=1.5):
 

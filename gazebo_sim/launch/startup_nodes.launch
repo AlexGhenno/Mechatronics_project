@@ -4,6 +4,7 @@
  <include file="$(find ar_helipad)/launch/bebop_helipad_individual.launch"/>-->
  <node name="marker_vel_estimator" pkg="gazebo_sim" type="marker_vel_estimator.py" output="screen"/>
  <node name="aerial_local_planner" pkg="gazebo_sim" type="UAV_local_planner.py" output="screen"/>
+ <!-- <node name="aerial_local_planner" pkg="gazebo_sim" type="UAV_local_plannerAlex.py" output="screen"/> -->
  <node name="aerial_global_planner" pkg="gazebo_sim" type="UAV_global_planner.py" output="screen"/>
 </launch>
  
